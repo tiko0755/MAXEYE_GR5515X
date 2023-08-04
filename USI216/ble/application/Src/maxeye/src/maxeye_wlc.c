@@ -142,7 +142,7 @@ void wlc_ask_data_generate(uint8_t * mac)
 }
 
 
-// 启动ASK传输任务
+// 启动ASK传输任务, will loop it and stop it by BLE connected call back
 static sdk_err_t wlc_ask_task_start(uint16_t wDelaymS, void* e)
 {
     app_timer_stop(wlc_ask_task_id);

@@ -58,7 +58,6 @@
 #include "maxeye_notify.h"
 #include "maxeye_sleep.h"
 
-
 #include "maxeye_product_test.h"
 #include "maxeye_wlc.h"
 #include "maxeye_battery.h"
@@ -67,6 +66,7 @@
 #include "maxeye_private_services.h"
 #include "maxeye_public_services.h"
 
+#include "user_adv.h"
 #include "user_log.h"
 /*
  * DEFINES
@@ -81,37 +81,16 @@
 
 /**@brief Gapm config data. */
 
-
 #define DEVICE_NAME                        PENCIL_MODEL_NUM_STR  /**< Device Name which will be set in GAP. */
-#define APP_ADV_FAST_MIN_INTERVAL          32               /**< The fast advertising min interval (in units of 0.625 ms. This value corresponds to 160 ms). */
-#define APP_ADV_FAST_MAX_INTERVAL          48               /**< The fast advertising max interval (in units of 0.625 ms. This value corresponds to 1000 ms). */
-#define APP_ADV_SLOW_MIN_INTERVAL          160              /**< The slow advertising min interval (in units of 0.625 ms). */
-#define APP_ADV_SLOW_MAX_INTERVAL          160              /**< The slow advertising max interval (in units of 0.625 ms). */
-#define APP_ADV_TIMEOUT_IN_SECONDS         0                /**< The advertising timeout in units of seconds. */
-
-
-
-
 
 #define MIN_CONN_INTERVAL                  12//320           /**< Minimum acceptable connection interval (0.4 seconds). */
 #define MAX_CONN_INTERVAL                  12//520          /**< Maximum acceptable connection interval (0.65 second). */
 #define SLAVE_LATENCY                      0                /**< Slave latency. */
 #define CONN_SUP_TIMEOUT                   400              /**< Connection supervisory timeout (4 seconds). */
 
-
-
 #define BLE_PAIR_ENABLE
 // #define BLE_BONDED_ENABLE
 #define GAP_CONN_CFG_ENABLE
-
-
-uint8_t s_is_adv_exc_cplt = 0;
-
-// 0: initail, NO adv
-// 1: starting adv
-// 2: started cplt, advertising
-// 3: stoping adv
-uint8_t adv_stage = 0;  
 
 /*
  * LOCAL VARIABLE DEFINITIONS
@@ -121,38 +100,12 @@ uint8_t adv_stage = 0;
 static gap_bdaddr_t s_bonded_bdaddr;
 #endif
 
-static gap_adv_param_t      s_gap_adv_param;            /**< Advertising parameters for legay advertising. */
-static gap_adv_time_param_t s_gap_adv_time_param;       /**< Advertising time parameter. */
-
-static const uint8_t s_adv_data_set[] =                 /**< Advertising data. */
-{
-    PENCIL_MODEL_NUM_LEN+1,   // Length of this data
-    BLE_GAP_AD_TYPE_COMPLETE_NAME,
-    PENCIL_MODEL_NUM_STR_S
-    0x03,
-    BLE_GAP_AD_TYPE_APPEARANCE,
-    LO_U16(BLE_APPEARANCE_HID_DIGITAL_PEN),
-    HI_U16(BLE_APPEARANCE_HID_DIGITAL_PEN),
-
-    0x02,
-    BLE_GAP_AD_TYPE_TRANSMIT_POWER,
-    0,
-    0,
-};
-
-static const uint8_t s_adv_rsp_data_set[] = /**< Scan responce data. */
-{
-    // length of this data
-    PENCIL_MODEL_NUM_LEN+1,   // Length of this data
-    BLE_GAP_AD_TYPE_COMPLETE_NAME,
-    PENCIL_MODEL_NUM_STR_S
-};
-
 
 /*
  * LOCAL FUNCTION DEFINITIONS
  *****************************************************************************************
  */
+ 
 /*****************************************************************************************
  *@brief Function for the GAP initialization.
  *
@@ -217,38 +170,7 @@ static void gap_params_init(void)
 
 
 
-static void adv_params_init(void)
-{
-    sdk_err_t   error_code;
 
-    s_gap_adv_time_param.max_adv_evt = 0;
-    s_gap_adv_param.chnl_map         = GAP_ADV_CHANNEL_37_38_39;
-    s_gap_adv_param.max_tx_pwr       = 0;
-
-    memset(&s_gap_adv_param.peer_addr, 0, sizeof(gap_bdaddr_t));
-    s_gap_adv_param.disc_mode  = GAP_DISC_MODE_NON_DISCOVERABLE;
-    s_gap_adv_param.adv_mode   = GAP_ADV_TYPE_ADV_IND;
-    s_gap_adv_param.filter_pol = GAP_ADV_ALLOW_SCAN_ANY_CON_ANY;
-
-    s_gap_adv_param.adv_intv_max = APP_ADV_SLOW_MAX_INTERVAL;
-    s_gap_adv_param.adv_intv_min = APP_ADV_SLOW_MIN_INTERVAL;
-
-    error_code = ble_gap_adv_data_set(0, BLE_GAP_ADV_DATA_TYPE_DATA,
-                                      s_adv_data_set, sizeof(s_adv_data_set));
-    APP_ERROR_CHECK(error_code);
-
-
-
-    error_code = ble_gap_adv_param_set(0, BLE_GAP_OWN_ADDR_STATIC,
-                                       &s_gap_adv_param);
-    APP_ERROR_CHECK(error_code);
-
-
-    error_code = ble_gap_adv_data_set(0, BLE_GAP_ADV_DATA_TYPE_SCAN_RSP,
-                                      s_adv_rsp_data_set, sizeof(s_adv_rsp_data_set));
-    APP_ERROR_CHECK(error_code);
-
-}
 
 static void services_init(void)
 {
@@ -339,36 +261,5 @@ void ble_init_cmp_callback(void)
     services_init();
     gap_params_init();
     adv_params_init();
-}
-
-uint16_t user_adv_stop(uint8_t index){
-    sdk_err_t error_code;
-    error_code = ble_gap_adv_stop(index);
-    
-//    extern void ble_task_force_schedule(void);
-//    s_is_adv_exc_cplt = 0;
-//    
-//    error_code = ble_gap_adv_stop(index);
-//    if(error_code == SDK_SUCCESS){
-//        while(!s_is_adv_exc_cplt){
-//            ble_task_force_schedule();
-//        }
-//    }
-    return error_code;
-}
-
-void maxeye_ble_adv_start(uint16_t wAdvDuration)
-{
-    logX("<%s adv_stage:%d>", __func__, adv_stage);
-    
-    if(adv_stage !=0 ){
-        ble_gap_adv_stop(0);
-        return;
-    }
-    
-    sdk_err_t error_code = SDK_SUCCESS;
-    s_gap_adv_time_param.duration = wAdvDuration;
-    error_code = ble_gap_adv_start(0, &s_gap_adv_time_param);
-    logX("</%s adv_start:0x%02x>", __func__, error_code);
 }
 

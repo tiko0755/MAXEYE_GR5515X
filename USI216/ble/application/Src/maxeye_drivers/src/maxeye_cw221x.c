@@ -8,6 +8,7 @@
  *****************************************************************************************
 **/
 #include "app_log.h"
+#include "user_log.h"
 #include "app_error.h"
 #include "app_i2c.h"
 
@@ -94,6 +95,7 @@ static volatile uint8_t iicAddr = CW2217_ADDR;
 *******************************************************************************/
 uint16_t cw_read(uint8_t regAddr,uint8_t *pData)
 {
+    logX("<%s >", __func__);
     uint16_t ret;
 
 	for(uint8_t i = 0; i < 3; i++) 
@@ -104,6 +106,7 @@ uint16_t cw_read(uint8_t regAddr,uint8_t *pData)
 			break;
 		}
 	}
+    logX("</%s >", __func__);
 	return ret;
 }
 
@@ -118,6 +121,7 @@ uint16_t cw_read(uint8_t regAddr,uint8_t *pData)
 *******************************************************************************/
 uint16_t cw_write(uint8_t regAddr,uint8_t *pData)
 {
+    logX("<%s >", __func__);
 	uint16_t ret;
 
 	for(uint8_t i = 0; i < 3; i++) 
@@ -128,6 +132,7 @@ uint16_t cw_write(uint8_t regAddr,uint8_t *pData)
 			break;
 		}
 	}
+    logX("</%s >", __func__);
 	return ret;
 }
 
@@ -142,9 +147,11 @@ uint16_t cw_write(uint8_t regAddr,uint8_t *pData)
 *******************************************************************************/
 uint16_t cw_read_nbyte(uint8_t regAddr,uint8_t *pData, uint8_t len)
 {
+    logX("<%s >", __func__);
     uint16_t ret;
+    uint8_t i;
 
-	for(uint8_t i = 0; i < 3; i++) 
+	for(i = 0; i < 3; i++) 
 	{
 		ret = maxeye_i2c0_read(iicAddr,regAddr,I2C_MEMADD_SIZE_8BIT,pData,len);
 		if (ret==APP_DRV_SUCCESS) 
@@ -152,6 +159,7 @@ uint16_t cw_read_nbyte(uint8_t regAddr,uint8_t *pData, uint8_t len)
 			break;
 		}
 	}
+    logX("</%s i:%d ret:%d >", __func__, i, ret);
 	return ret;
 }
 
@@ -166,6 +174,7 @@ uint16_t cw_read_nbyte(uint8_t regAddr,uint8_t *pData, uint8_t len)
 *******************************************************************************/
 uint16_t cw_write_nbyte(uint8_t regAddr,uint8_t *pData, uint8_t len)
 {
+    logX("<%s >", __func__);
 	uint16_t ret;
 
 	for(uint8_t i = 0; i < 3; i++) 
@@ -176,6 +185,7 @@ uint16_t cw_write_nbyte(uint8_t regAddr,uint8_t *pData, uint8_t len)
 			break;
 		}
 	}
+    logX("</%s >", __func__);
 	return ret;
 
 }

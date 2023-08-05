@@ -32,7 +32,7 @@
  * LOCAL VARIABLE DEFINITIONS
  *****************************************************************************************
  */
-static uint8_t logMask = 0;
+static uint8_t logMask = 3;
 
 void logX(const char* FORMAT_ORG, ...){
     if((logMask&(1U<<0)) == 0){  

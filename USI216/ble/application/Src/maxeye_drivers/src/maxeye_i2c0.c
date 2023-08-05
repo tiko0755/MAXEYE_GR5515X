@@ -24,6 +24,7 @@
 
 #include "maxeye_i2c.h"
 #include "maxeye_cw221x.h"
+#include "maxeye_wdt.h"
 
 /*
  * DEFINES
@@ -48,7 +49,7 @@
 #define I2C_WAIT_IDLE_TIMER              10
 
 
-#define I2C_SYN_TIME_OUT                 100
+#define I2C_SYN_TIME_OUT                 10
 
 // #define I2C_TX_HOLD_CFG
 #define I2C_TX_HOLD_METER                0x0F
@@ -73,8 +74,6 @@
  * LOCAL FUNCTION DEFINITIONS
  *****************************************************************************************
  */
-
-
 
 /**
  *****************************************************************************************
@@ -211,9 +210,8 @@ uint16_t maxeye_i2c0_write(uint16_t dev_address, uint16_t mem_address, uint16_t 
     return ret;
 
     #else
-
-
-    return app_i2c_mem_write_sync(APP_I2C_ID_0,dev_address,mem_address,mem_addr_size,p_data,size,I2C_SYN_TIME_OUT); 
+    maxeye_wdt_refresh();
+    return app_i2c_mem_write_sync(APP_I2C_ID_0,dev_address,mem_address,mem_addr_size,p_data,size,I2C_SYN_TIME_OUT); ; 
     #endif
 
 }
@@ -229,6 +227,7 @@ uint16_t maxeye_i2c0_write(uint16_t dev_address, uint16_t mem_address, uint16_t 
  * @return 
  *****************************************************************************************
  */
+
 uint16_t maxeye_i2c0_read(uint16_t dev_address, uint16_t mem_address, uint16_t mem_addr_size, uint8_t *p_data, uint16_t size)
 {
     #ifdef I2C_TX_HOLD_CFG
@@ -270,7 +269,8 @@ uint16_t maxeye_i2c0_read(uint16_t dev_address, uint16_t mem_address, uint16_t m
     return ret;
 
     #else
-    return app_i2c_mem_read_sync(APP_I2C_ID_0,dev_address,mem_address,mem_addr_size,p_data,size,I2C_SYN_TIME_OUT); 
+    maxeye_wdt_refresh();
+    return app_i2c_mem_read_sync(APP_I2C_ID_0,dev_address,mem_address,mem_addr_size,p_data,size,I2C_SYN_TIME_OUT); ;
     #endif
 }
 
@@ -323,7 +323,8 @@ uint16_t maxeye_i2c0_transmit(uint16_t dev_address, uint8_t *p_data, uint16_t si
     return ret;
 
     #else
-    return app_i2c_transmit_sync(APP_I2C_ID_0,dev_address,p_data,size,I2C_SYN_TIME_OUT);
+    maxeye_wdt_refresh();
+    return app_i2c_transmit_sync(APP_I2C_ID_0,dev_address,p_data,size,I2C_SYN_TIME_OUT);;
     #endif
 }
 
@@ -380,8 +381,8 @@ uint16_t maxeye_i2c0_receive(uint16_t dev_address, uint8_t *p_data, uint16_t siz
     return ret;
 
     #else
-
-    return app_i2c_receive_sync(APP_I2C_ID_0,dev_address,p_data,size,I2C_SYN_TIME_OUT);
+    maxeye_wdt_refresh();
+    return app_i2c_receive_sync(APP_I2C_ID_0,dev_address,p_data,size,I2C_SYN_TIME_OUT);;
     #endif
 }
 

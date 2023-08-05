@@ -2,6 +2,7 @@
  * Include files
  ******************************************************************************/
 #include "app_log.h"
+#include "user_log.h"
 #include "app_error.h"
 #include "app_i2c.h"
 
@@ -56,6 +57,7 @@ static uint8_t gSensorType=0;
  */
 uint8_t LIS2DH12TR_WriteRegister(uint8_t regAddr, uint8_t regData)
 {
+    logX("<%s >", __func__);
 	uint16_t ret;
 
 	for(uint8_t i = 0; i < 3; i++) 
@@ -66,6 +68,7 @@ uint8_t LIS2DH12TR_WriteRegister(uint8_t regAddr, uint8_t regData)
 			break;
 		}
 	}
+    logX("</%s >", __func__);
 	return ret;
 }
 
@@ -81,6 +84,7 @@ uint8_t LIS2DH12TR_WriteRegister(uint8_t regAddr, uint8_t regData)
  */
 uint8_t LIS2DH12TR_ReadRegister(uint8_t regAddr, uint8_t * regData) 
 {
+    logX("<%s >", __func__);
     uint16_t ret;
 
 	for(uint8_t i = 0; i < 3; i++) 
@@ -91,6 +95,7 @@ uint8_t LIS2DH12TR_ReadRegister(uint8_t regAddr, uint8_t * regData)
 			break;
 		}
 	}
+    logX("</%s >", __func__);
 	return ret;
 }
 

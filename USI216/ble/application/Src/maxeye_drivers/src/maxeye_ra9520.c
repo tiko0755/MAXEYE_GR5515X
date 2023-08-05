@@ -13,6 +13,7 @@
  *****************************************************************************************
  */
 #include "app_log.h"
+#include "user_log.h"
 #include "app_error.h"
 #include "app_i2c.h"
 
@@ -56,6 +57,7 @@ static volatile uint8_t iicAddr = RA9520_7BIT_ADDR;
  */
 uint16_t RA9520_WriteRegister(uint16_t regAddr, uint8_t *regData,uint8_t dataLen)
 {
+    logX("<%s >", __func__);
     uint16_t ret;
 
     for(uint8_t i = 0; i < 3; i++) 
@@ -66,14 +68,17 @@ uint16_t RA9520_WriteRegister(uint16_t regAddr, uint8_t *regData,uint8_t dataLen
             break;
         }
     }
+    logX("</%s >", __func__);
     return ret;
 }
 
 uint16_t RA9520_ReadRegister(uint16_t regAddr, uint8_t * regData,uint8_t dataLen)
 {
+    logX("<%s >", __func__);
     uint16_t ret;
+    uint8_t i;
 
-    for(uint8_t i = 0; i < 3; i++) 
+    for( i = 0; i < 3; i++)
     {
         ret = maxeye_i2c0_read(iicAddr,regAddr,I2C_MEMADD_SIZE_16BIT,regData,dataLen);
         if (ret==APP_DRV_SUCCESS) 
@@ -81,6 +86,7 @@ uint16_t RA9520_ReadRegister(uint16_t regAddr, uint8_t * regData,uint8_t dataLen
             break;
         }
     }
+    logX("</%s i:%d ret:%d >", __func__,i, ret);
     return ret;
 }
 

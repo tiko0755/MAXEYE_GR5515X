@@ -1,5 +1,6 @@
 
 #include "app_log.h"
+#include "user_log.h"
 #include "app_error.h"
 #include "app_i2c.h"
 
@@ -90,7 +91,10 @@ int8_t I2cPlatformWrite(uint8_t *reg_data, uint16_t length)
 
 int8_t I2cPlatformRead(uint8_t reg_addr, uint8_t *reg_data, uint16_t length)
 {
-	return maxeye_i2c0_read(FT3308_I2C_DEV_ADDR,reg_addr,I2C_MEMADD_SIZE_8BIT,reg_data,length);
+    logX("<%s >", __func__);
+	uint16_t rtn = maxeye_i2c0_read(FT3308_I2C_DEV_ADDR,reg_addr,I2C_MEMADD_SIZE_8BIT,reg_data,length);
+    logX("</%s >", __func__);
+    return rtn;
 }
 
 /************************************************************************

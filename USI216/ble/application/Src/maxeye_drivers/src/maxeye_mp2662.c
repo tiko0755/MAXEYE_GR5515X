@@ -2,6 +2,7 @@
  * Include files
  ******************************************************************************/
 #include "app_log.h"
+#include "user_log.h"
 #include "app_error.h"
 #include "app_i2c.h"
 
@@ -64,6 +65,7 @@ static volatile uint8_t iicAddr = MP2662_7BIT_ADDR;
 
 static uint16_t MP2662_WriteRegister(uint8_t regAddr, uint8_t regData)
 {
+    logX("<%s >", __func__);
     uint16_t ret;
 
 	for(uint8_t i = 0; i < 3; i++) 
@@ -74,6 +76,7 @@ static uint16_t MP2662_WriteRegister(uint8_t regAddr, uint8_t regData)
 			break;
 		}
 	}
+    logXX("</%s >", __func__);
 	return ret;
 }
 
@@ -81,7 +84,9 @@ static uint16_t MP2662_WriteRegister(uint8_t regAddr, uint8_t regData)
 
 static uint16_t MP2662_ReadRegister(uint8_t regAddr, uint8_t * regData)
 {
+    logX("<%s >", __func__);
     uint16_t ret;
+    uint8_t i;
 
     for(uint8_t i = 0; i < 3; i++) 
 	{
@@ -91,6 +96,7 @@ static uint16_t MP2662_ReadRegister(uint8_t regAddr, uint8_t * regData)
 			break;
 		}
 	}
+    logX("</%s i:%d ret:%d>", __func__, i, ret);
 	return ret;
 }
 
